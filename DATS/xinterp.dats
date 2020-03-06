@@ -61,7 +61,8 @@ UN = "prelude/SATS/unsafe.sats"
 //
 (* ****** ****** *)
 //
-val test = $list{int}(0, 1, 2, 3, 4)
+val test0 = $list{int}(0, 1, 2, 3, 4)
+val test1 = $list{int}(5, 6, 7, 8, 9)
 
 implement
 main0(argc, argv) =
@@ -70,7 +71,10 @@ main0(argc, argv) =
 if
 (argc >= 2)
 then interp0_main0(argc, argv)
-else (prerrln! ("Hello from ATS3(xinterp)!"); pprintln<List(int)>(test))
+else ( prerrln! ("Hello from ATS3(xinterp)!")
+     ; pprintln<List(int)>(test0)
+     ; pprintln<List(int)>(test1)
+     )
 where
 {
   implement

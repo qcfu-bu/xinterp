@@ -135,8 +135,7 @@ clean:: ; $(RMF) pprint_dats.c
 
 cleanall:: clean
 cleanall:: ; $(RMF) ./bin/pprint
-cleanall:: ; $(RMF) ./xanadu/lib/libxatsopt.a
-cleanall:: ; $(MAKE) -C ./xanadu/srcgen/xats cleanall
+cleanall:: ; $(RMF) ./lib/libpprint.a
 
 ######
 
