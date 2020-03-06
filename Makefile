@@ -83,6 +83,11 @@ libxatsopt: ; \
 
 ######
 
+libextension: ; \
+(cd ./extension && $(MAKE) all)
+
+######
+
 BUILD/%_sats.c: \
 ./SATS/%.sats ; $(PATSOPT) -o $@ --static $<
 BUILD/%_dats.c: \
