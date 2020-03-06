@@ -61,7 +61,10 @@ $(patsubst %.dats, BUILD/%_dats.o, $(SRCDATS))
 INCLUDE:=
 INCLUDE+=-I"."
 INCLUDE+=-I"./xanadu/srcgen/xats"
-LIBRARY:=-L"./xanadu/lib" -lxatsopt
+INCLUDE+=-I"./extension/pprint"
+LIBRARY:=
+LIBRARY+=-L"./xanadu/lib" -lxatsopt
+LIBRARY+=-L"./extension/pprint/lib"
 
 ######
 #

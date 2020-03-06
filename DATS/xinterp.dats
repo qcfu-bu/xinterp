@@ -43,6 +43,8 @@
 UN = "prelude/SATS/unsafe.sats"
 //
 (* ****** ****** *)
+#include
+"./../HATS/libextension.hats"
 //
 #staload "./../SATS/interp0.sats"
 //
@@ -59,6 +61,8 @@ UN = "prelude/SATS/unsafe.sats"
 //
 (* ****** ****** *)
 //
+val test = $list{int}(0, 1, 2, 3, 4)
+
 implement
 main0(argc, argv) =
 (
@@ -66,7 +70,12 @@ main0(argc, argv) =
 if
 (argc >= 2)
 then interp0_main0(argc, argv)
-else prerrln! ("Hello from ATS3(xinterp)!")
+else (prerrln! ("Hello from ATS3(xinterp)!"); pprintln<List(int)>(test))
+where
+{
+  implement
+  pprint<int>(x) = print(x)
+}
 // end of [if]
 ) (* end of [main] *)
 //
