@@ -13,8 +13,6 @@ LOC = "{$XANADU}/SATS/locinfo.sats"
 //
 (* ****** ****** *)
 //
-#staload
-LEX = "{$XANADU}/SATS/lexing.sats"
 //
 (* ****** ****** *)
 //
@@ -37,11 +35,3 @@ D2E = "{$XANADU}/SATS/dynexp2.sats"
 //
 #staload
 D3E = "{$XANADU}/SATS/dynexp3.sats"
-
-fun
-{a:t@ype}
-pprint(x:a): void
-
-fun
-{a:t@ype}
-pprintln(x:a): void

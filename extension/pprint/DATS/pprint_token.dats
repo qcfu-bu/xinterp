@@ -5,233 +5,548 @@ UN = "prelude/SATS/unsafe.sats"
 
 #staload
 "./../SATS/pprint.sats"
+#staload
+"./pprint_basic.dats"
+
+#define XANADU_targetloc
+"./../../../xanadu/srcgen/xats"
+#staload
+"{$XANADU}/SATS/lexing.sats"
+#staload
+"{$XANADU}/SATS/basics.sats"
+
+(* ****** ****** *)
+
+fun
+fprint_sort(out, srt: int): void =
+( case-srt of
+| TBOXSORT => fprint(out, "$")
+| TFLTSORT => fprint(out, "@")
+| VTBOXSORT => fprint(out, "vt$")
+| VTFLTSORT => fprint(out, "vt@")
+)
+
+//
+(*
+#define VTYPESORT 2 // 00010
+*)
+#define VTBOXSORT 3 // 00011
+#define VTFLTSORT 2 // 00010
+#define VTFLATSORT 2 // 00010
 
 
-
+(* ****** ****** *)
 
 implement
-pprint<$LEX.tnode>(tnd) =
+fprint_tnode(out, tnd) =
+(
 case+ tnd of
-| $LEX.T_EOF() => print!("\n")
-| $LEX.T_ERR() => print!("error")
 //
-| $LEX.T_EOL() => print!("\n")
+| T_EOF() => fprint(out, "\n")
+| T_ERR() => fprint(out, "error")
 //
-| $LEX.T_BLANK(x) => print!(" ")
+| T_EOL() => fprint(out, "\n")
 //
-| $LEX.T_CLNLT(x) => print!(":<")
-| $LEX.T_DOTLT(x) => print!(".<")
+| T_BLANK(x) => fprint(out, " ")
 //
-| $LEX.T_IDENT_alp(x) => print!(x)
-| $LEX.T_IDENT_sym(x) => print!(x)
+| T_CLNLT(x) => fprint(out, ":<")
+| T_DOTLT(x) => fprint(out, ".<")
 //
-| $LEX.T_IDENT_srp(x) => print!(x)
-| $LEX.T_IDENT_dlr(x) => print!(x)
+| T_IDENT_alp(x) => fprint!(out, x)
+| T_IDENT_sym(x) => fprint(out, x)
 //
-| $LEX.T_IDENT_qual(x) => print!(x)
+| T_IDENT_srp(x) =>
+  fprint!(out, "#", x)
+| T_IDENT_dlr(x) =>
+  fprint!(out, "$", x)
 //
-| $LEX.T_INT1(rep) => print!(rep)
-| $LEX.T_INT2(base, rep) => print!(base, "x", rep)
-| $LEX.T_INT3(base, rep, k0(*sfx*)) =>
-  print!(base, "x", rep, "_", k0)
+| T_IDENT_qual(x) =>
+  fprint!(out, "$", x)
 //
-| $LEX.T_FLOAT1(rep) =>
-  print!(rep)
-| $LEX.T_FLOAT2(base, rep) =>
-  print!(base, "x", rep)
-| $LEX.T_FLOAT3(base, rep, k0(*sfx*)) =>
-  print!(base, "x", rep, "_", k0)
+| T_INT1(rep) => fprint(out, rep)
+| T_INT2(base, rep) =>
+  fprint!(out, base, "x", rep)
+| T_INT3(base, rep, k0(*sfx*)) =>
+  fprint!(out, base, "x", rep, "_", k0)
 //
-| $LEX.T_CHAR_nil(rep) =>
-  print!("CHAR_nil(", rep, ")")
-| $LEX.T_CHAR_char(rep) =>
-  print!("CHAR_char(", rep, ")")
-| $LEX.T_CHAR_slash(rep) =>
-  print!("CHAR_slash(", rep, ")")
+| T_FLOAT1(rep) => fprint(out, rep)
+| T_FLOAT2(base, rep) =>
+  fprint!(out, base, "x", rep)
+| T_FLOAT3(base, rep, k0(*sfx*)) =>
+  fprint!(out, base, "x", rep, "_", k0)
 //
-| $LEX.T_STRING_closed(str) =>
-  print!("STRING_closed(", str, ")")
-| $LEX.T_STRING_unclsd(str) =>
-  print!("STRING_unclsd(", str, ")")
+(*
+| T_CHAR(chr) =>
+  let
+    val chr = int2char0(chr)
+  in
+    fprint!(out, "CHAR(", chr, ")")
+  end
+*)
+| T_CHAR_nil(rep) => fprint(out, "''")
+| T_CHAR_char(rep) =>
+  fprint!(out, "'", rep, "'")
+| T_CHAR_slash(rep) =>
+  fprint!(out, "'", rep, "'")
 //
-| $LEX.T_SPECHAR(c) =>
-  print!("SPECHAR(", int2char0(c), ")")
+| T_STRING_closed(str) =>
+  fprint!(out, "\"", str, "\"")
+| T_STRING_unclsd(str) =>
+  fprint!(out, "\"", str)
 //
-| $LEX.T_COMMENT_line
+(*
+| T_CDATA(cdata, asz) => fprint!(out, "CDATA(...)")
+*)
+//
+| T_SPECHAR(c) =>
+  fprint!(out, "\'", int2char0(c), "\'")
+//
+| T_COMMENT_line
     (init, content) =>
-    print!("T_COMMENT_line(", init, "; ", "...)")
-| $LEX.T_COMMENT_rest
+    fprint!(out, init, content)
+| T_COMMENT_rest
     (init, content) =>
-    print!("T_COMMENT_rest(", init, "; ", "...)")
-| $LEX.T_COMMENT_cblock
+    fprint!(out, init, content)
+| T_COMMENT_cblock
     (level, content) =>
-    print!("T_COMMENT_cblock(", level, "; ", "...)")
-| $LEX.T_COMMENT_mlblock
+    fprint!(out, "/*", content, "*/")
+| T_COMMENT_mlblock
     (level, content) =>
-    print!("T_COMMENT_mlblock(", level, "; ", "...)")
+    fprint!(out, "(*", content, "*)")
 //
-| $LEX.T_AT() => print!("AT")
+| T_AT() => fprint(out, "@")
 //
-| $LEX.T_BAR() => print!("BAR")
-| $LEX.T_CLN() => print!("CLN")
-| $LEX.T_DOT() => print!("DOT")
+| T_BAR() => fprint(out, "|")
+| T_CLN() => fprint(out, ":")
+| T_DOT() => fprint(out, ".")
 //
-| $LEX.T_EQ() => print!("EQ")
+| T_EQ() => fprint(out, "=")
 //
-| $LEX.T_LT() => print!("LT")
-| $LEX.T_GT() => print!("GT")
+| T_LT() => fprint(out, "<")
+| T_GT() => fprint(out, ">")
 //
-| $LEX.T_DLR() => print!("DLR")
-| $LEX.T_SRP() => print!("SRP")
+| T_DLR() => fprint(out, "$")
+| T_SRP() => fprint(out, "#")
 //
-| $LEX.T_EQLT() => print!("EQLT")
-| $LEX.T_EQGT() => print!("EQGT")
+| T_EQLT() => fprint(out, "=<")
+| T_EQGT() => fprint(out, "=>")
 //
-| $LEX.T_LTGT() => print!("LTGT")
-| $LEX.T_GTLT() => print!("GTLT")
+| T_LTGT() => fprint(out, "<>")
+| T_GTLT() => fprint(out, "><")
 //
-| $LEX.T_MSLT() => print!("MSLT")
+| T_MSLT() => fprint(out, "-<")
 (*
-| $LEX.T_MSGT() => print!("MSGT")
-| T_MSLTGT() => print!("MSLTGT")
+| T_MSGT() => fprint(out, "MSGT")
+| T_MSLTGT() => fprint(out, "MSLTGT")
 *)
 //
 (*
-| $LEX.T_DOTLT() => print!("DOTLT")
+| T_DOTLT() => fprint(out, "DOTLT")
 *)
-| $LEX.T_GTDOT() => print!("GTDOT")
+| T_GTDOT() => fprint(out, ">.")
 //
-| $LEX.T_COMMA() => print!("COMMA")
-| $LEX.T_SMCLN() => print!("SMCLN")
+| T_COMMA() => fprint(out, ",")
+| T_SMCLN() => fprint(out, ";")
 //
-| $LEX.T_BSLASH() => print!("BSLASH")
+| T_BSLASH() => fprint(out, "\\")
 //
-| $LEX.T_LPAREN() => print!("LPAREN")
-| $LEX.T_RPAREN() => print!("RPAREN")
-| $LEX.T_LBRACE() => print!("LBRACE")
-| $LEX.T_RBRACE() => print!("RBRACE")
+| T_LPAREN() => fprint(out, "(")
+| T_RPAREN() => fprint(out, ")")
+| T_LBRACE() => fprint(out, "{")
+| T_RBRACE() => fprint(out, "}")
 //
-| $LEX.T_LBRACK() => print!("LBRACK")
-| $LEX.T_RBRACK() => print!("RBRACK")
+| T_LBRACK() => fprint(out, "[")
+| T_RBRACK() => fprint(out, "]")
 //
-| $LEX.T_EXISTS(knd) =>
-  print!("EXISTS(", knd, ")")
+| T_EXISTS(knd) =>
+  ( fprint_sort(out, knd)
+  ; fprint!(out, "[]")
+  )
 //
-| $LEX.T_TUPLE(knd) =>
-  print!("TUPLE(", knd, ")")
-| $LEX.T_RECORD(knd) =>
-  print!("RECORD(", knd, ")")
+| T_TUPLE(knd) =>
+  ( fprint_sort(out, knd)
+  ; fprint!(out, "(")
+  )
+| T_RECORD(knd) =>
+  ( fprint_sort(out, knd)
+  ; fprint!(out, "{")
+  )
 (*
-| $LEX.T_STRUCT() => print!("STRUCT")
+| T_STRUCT() => fprint(out, "STRUCT")
 *)
 //
-| $LEX.T_AS() => print!("AS")
+| T_AS() => fprint(out, "as")
 //
-| $LEX.T_OF() => print!("OF")
+| T_OF() => fprint(out, "of")
 //
-| $LEX.T_OP() => print!("OP")
+| T_OP() => fprint(out, "op")
 //
-| $LEX.T_OP_par() =>
-  print!("OP_par()")
-| $LEX.T_OP_sym(id) =>
-  print!("OP_sym(", id, ")")
+| T_OP_par() => fprint(out, "op(")
+| T_OP_sym(id) =>
+  fprint!(out, "op(", id, ")")
 //
-| $LEX.T_IN() => print!("IN")
+| T_IN() => fprint(out, "in")
 //
-| $LEX.T_AND() => print!("AND")
-| $LEX.T_END() => print!("END")
+| T_AND() => fprint(out, "and")
+| T_END() => fprint(out, "end")
 //
-| $LEX.T_IF() => print!("IF")
-| $LEX.T_SIF() => print!("SIF")
-| $LEX.T_THEN() => print!("THEN")
-| $LEX.T_ELSE() => print!("ELSE")
+| T_IF() => fprint(out, "if")
+| T_SIF() => fprint(out, "sif")
+| T_THEN() => fprint(out, "then")
+| T_ELSE() => fprint(out, "else")
 //
-| $LEX.T_WHEN() => print!("WHEN")
-| $LEX.T_WITH() => print!("WITH")
+| T_WHEN() => fprint(out, "when")
+| T_WITH() => fprint(out, "with")
 //
-| $LEX.T_CASE(k0) =>
-  print!("CASE(", k0, ")")
+| T_CASE(k0) => fprint(out, "case")
 //
-| $LEX.T_SCASE() => print!("SCASE()")
+| T_SCASE() => fprint(out, "scase")
 //
-| $LEX.T_ENDIF() => print!("ENDIF")
-| $LEX.T_ENDSIF() => print!("ENDSIF")
-| $LEX.T_ENDCASE() => print!("ENDCASE")
-| $LEX.T_ENDSCASE() => print!("ENDSCASE")
+| T_ENDIF() => fprint(out, "endif")
+| T_ENDSIF() => fprint(out, "endsif")
+| T_ENDCASE() => fprint(out, "endcase")
+| T_ENDSCASE() => fprint(out, "endscase")
 //
-| $LEX.T_LAM(knd) =>
-  print!("LAM(", knd, ")")
-| $LEX.T_FIX(knd) =>
-  print!("FIX(", knd, ")")
+| T_LAM(knd) =>
+  ( fprint!(out, "lam")
+  ; case-knd of
+  | TBOXSORT => ()
+  | TFLTSORT => fprint(out, "@")
+  )
+| T_FIX(knd) =>
+  ( fprint!(out, "fix")
+  ; case-knd of
+  | TBOXSORT => ()
+  | TFLTSORT => fprint(out, "@")
+  )
 //
-| $LEX.T_LET() => print!("LET")
-| $LEX.T_TRY() => print!("TRY")
-| $LEX.T_WHERE() => print!("WHERE")
-| $LEX.T_LOCAL() => print!("LOCAL")
+| T_LET() => fprint(out, "let")
+| T_TRY() => fprint(out, "try")
+| T_WHERE() => fprint(out, "where")
+| T_LOCAL() => fprint(out, "local")
 //
-| $LEX.T_ENDLAM() => print!("ENDLAM")
-| $LEX.T_ENDLET() => print!("ENDLET")
-| $LEX.T_ENDTRY() => print!("ENDTRY")
-| $LEX.T_ENDWHERE() => print!("ENDWHERE")
-| $LEX.T_ENDLOCAL() => print!("ENDLOCAL")
+| T_ENDLAM() => fprint(out, "endlam")
+| T_ENDLET() => fprint(out, "endlet")
+| T_ENDTRY() => fprint(out, "endtry")
+| T_ENDWHERE() => fprint(out, "endwhere")
+| T_ENDLOCAL() => fprint(out, "endlocal")
 //
-| $LEX.T_VAL(vlk) =>
-  print!("VAL(", vlk, ")")
-| $LEX.T_VAR() => print!("VAR")
+| T_VAL(vlk) =>
+  fprint!(out, vlk)
+| T_VAR() => fprint!(out, "var")
 //
-| $LEX.T_FUN(fnk) =>
-  print!("FUN(", fnk, ")")
+| T_FUN(fnk) => fprint(out, fnk)
 //
-| $LEX.T_IMPLMNT(knd) =>
-  print!("IMPLMNT(", knd, ")")
+| T_IMPLMNT(knd) => fprint(out, knd)
 //
-| $LEX.T_ABSSORT() =>
-  print!("ABSSORT(", ")")
+| T_ABSSORT() => fprint(out, "abssort")
 //
-| $LEX.T_SORTDEF() =>
-  print!("SORTDEF(", ")")
+| T_SORTDEF() => fprint(out, "sortdef")
 //
-| $LEX.T_SEXPDEF(srt) =>
-  print!("SEXPDEF(", srt, ")")
+| T_SEXPDEF(srt) =>
+  fprint!(out, "sexpdef(", srt, ")")
 //
-| $LEX.T_ABSTYPE(srt) =>
-  print!("ABSTYPE(", srt, ")")
+| T_ABSTYPE(srt) =>
+  fprint!(out, "abstype(", srt, ")")
 //
-| $LEX.T_ABSIMPL() =>
-  print!("ABSIMPL")
-| $LEX.T_ABSOPEN() =>
-  print!("ABSOPEN")
+| T_ABSIMPL() =>
+  fprint!(out, "absimpl")
+| T_ABSOPEN() =>
+  fprint!(out, "absopen")
 //
-| $LEX.T_DATASORT() =>
-  print!("DATASORT")
+| T_DATASORT() =>
+  fprint!(out, "datasort")
 //
-| $LEX.T_EXCPTCON() =>
-  print!("EXCPTCON")
+| T_EXCPTCON() =>
+  fprint!(out, "exception")
 //
-| $LEX.T_DATATYPE(srt) =>
-  print!("DATATYPE(", srt, ")")
+| T_DATATYPE(srt) =>
+  fprint!(out, "datatype(", srt, ")")
 //
-| $LEX.T_WITHTYPE(srt) =>
-  print!("WITHTYPE(", srt, ")")
+| T_WITHTYPE(srt) =>
+  fprint!(out, "withtype(", srt, ")")
 //
-|$LEX. T_SRP_NONFIX() =>
-  print!("#NONFIX")
-| $LEX.T_SRP_FIXITY(knd) =>
-  print!("#FIXIXTY(", knd, ")")
+| T_SRP_NONFIX() => fprint(out, "#nonfix")
+| T_SRP_FIXITY(knd) => fprint(out, "#fixixty")
 //
-| $LEX.T_SRP_STACST() => print!("#STACST")
+| T_SRP_STACST() => fprint(out, "#stacst")
 //
-| $LEX.T_SRP_STATIC() => print!("#STATIC")
-| $LEX.T_SRP_EXTERN() => print!("#EXTERN")
+| T_SRP_STATIC() => fprint(out, "#static")
+| T_SRP_EXTERN() => fprint(out, "#extern")
 //
-| $LEX.T_SRP_DEFINE() => print!("#DEFINE")
-| $LEX.T_SRP_MACDEF() => print!("#MACDEF")
+| T_SRP_DEFINE() => fprint(out, "#define")
+| T_SRP_MACDEF() => fprint(out, "#macdef")
 //
-| $LEX.T_SRP_INCLUDE() => print!("#INCLUDE")
+| T_SRP_INCLUDE() => fprint(out, "#include")
 //
-| $LEX.T_SRP_STALOAD() => print!("#STALOAD")
-| $LEX.T_SRP_DYNLOAD() => print!("#DYNLOAD")
+| T_SRP_STALOAD() => fprint(out, "#staload")
+| T_SRP_DYNLOAD() => fprint(out, "#dynload")
 //
-| $LEX.T_SRP_SYMLOAD() => print!("#SYMLOAD")
+| T_SRP_SYMLOAD() => fprint(out, "#symload")
 //
-(* end of [pprint] *)
+) (* end of [fprint_tnode] *)
+//
+(* ****** ****** *)
+//
+implement
+print_token
+  (tok) =
+  fprint_token(stdout_ref, tok)
+implement
+prerr_token
+  (tok) =
+  fprint_token(stderr_ref, tok)
+//
+implement
+fprint_token
+  (out, tok) =
+(
+  fprint(out, tok.node())
+(*
+  fprint!(out, tok.loc(), ": ", tok.node())
+*)
+)
+//
+(* ****** ****** *)
+//
+implement
+print2_tnode
+  (tok) =
+  fprint2_tnode(stdout_ref, tok)
+implement
+prerr2_tnode
+  (tok) =
+  fprint2_tnode(stderr_ref, tok)
+//
+(* ****** ****** *)
+//
+implement
+fprint2_tnode(out, tnd) =
+(
+case+ tnd of
+//
+| T_EOF() => ()
+| T_ERR() =>
+  fprint(out, "*ERROR*")
+//
+| T_EOL() => fprint(out, "\n")
+//
+| T_BLANK(x) => fprint(out, x)
+//
+| T_CLNLT(x) => fprint(out, x)
+| T_DOTLT(x) => fprint(out, x)
+//
+| T_IDENT_alp(x) => fprint(out, x)
+| T_IDENT_sym(x) => fprint(out, x)
+//
+| T_IDENT_srp(x) => fprint(out, x)
+| T_IDENT_dlr(x) => fprint(out, x)
+//
+| T_IDENT_qual(x) => fprint(out, x)
+//
+| T_INT1(rep) => fprint(out, rep)
+| T_INT2(base, rep) => fprint(out, rep)
+| T_INT3(base, rep, _(*sfx*)) => fprint(out, rep)
+//
+| T_FLOAT1(rep) => fprint(out, rep)
+| T_FLOAT2(base, rep) => fprint(out, rep)
+| T_FLOAT3(base, rep, _(*sfx*)) => fprint(out, rep)
+//
+(*
+| T_CHAR(chr) =>
+  let
+    val chr = int2char0(chr)
+  in
+    fprint!(out, "CHAR(", chr, ")")
+  end
+*)
+| T_CHAR_nil(rep) => fprint(out, rep)
+| T_CHAR_char(rep) => fprint(out, rep)
+| T_CHAR_slash(rep) => fprint(out, rep)
+//
+| T_STRING_closed(str) => fprint(out, str)
+| T_STRING_unclsd(str) => fprint(out, str)
+//
+(*
+| T_CDATA(cdata, asz) => fprint!(out, "CDATA(...)")
+*)
+//
+| T_SPECHAR(c) =>
+  fprint(out, c) where{val c=int2char0(c)}
+//
+| T_COMMENT_line
+    (init, content) =>
+    fprint!(out, init, content)
+| T_COMMENT_rest
+    (init, content) =>
+    fprint!(out, init, content)
+| T_COMMENT_cblock
+    (level, content) => fprint(out, content)
+| T_COMMENT_mlblock
+    (level, content) => fprint(out, content)
+//
+| T_AT() => fprint(out, "@")
+//
+| T_BAR() => fprint(out, "|")
+| T_CLN() => fprint(out, ":")
+| T_DOT() => fprint(out, ".")
+//
+| T_EQ() => fprint(out, "=")
+//
+| T_LT() => fprint(out, "<")
+| T_GT() => fprint(out, ">")
+//
+| T_DLR() => fprint(out, "$")
+| T_SRP() => fprint(out, "#")
+//
+| T_EQLT() => fprint(out, "=<")
+| T_EQGT() => fprint(out, "=>")
+//
+| T_LTGT() => fprint(out, "<>")
+| T_GTLT() => fprint(out, "><")
+//
+| T_MSLT() => fprint(out, "-<")
+(*
+| T_MSGT() => fprint(out, "->")
+| T_MSLTGT() => fprint(out, "-<>")
+*)
+//
+| T_GTDOT() => fprint(out, ">.")
+//
+| T_COMMA() => fprint(out, ",")
+| T_SMCLN() => fprint(out, ";")
+//
+| T_BSLASH() => fprint(out, "\\")
+//
+| T_LPAREN() => fprint(out, "(")
+| T_RPAREN() => fprint(out, ")")
+| T_LBRACE() => fprint(out, "{")
+| T_RBRACE() => fprint(out, "}")
+//
+| T_LBRACK() => fprint(out, "[")
+| T_RBRACK() => fprint(out, "]")
+//
+| T_EXISTS(knd) =>
+  fprint!(out, "exists(", knd, ")")
+//
+| T_TUPLE(knd) =>
+  fprint!(out, "tuple(", knd, ")")
+| T_RECORD(knd) =>
+  fprint!(out, "record(", knd, ")")
+//
+(*
+| T_STRUCT(knd) =>
+  fprint!(out, "struct(", knd, ")")
+*)
+//
+| T_AS() => fprint(out, "as")
+//
+| T_OF() => fprint(out, "of")
+//
+| T_OP() => fprint(out, "op")
+//
+| T_OP_par() => fprint(out, "op(")
+| T_OP_sym(id) => fprint!(out, "op", id)
+//
+| T_IN() => fprint(out, "in")
+//
+| T_AND() => fprint(out, "and")
+| T_END() => fprint(out, "end")
+//
+| T_IF() => fprint(out, "if")
+| T_SIF() => fprint(out, "sif")
+| T_THEN() => fprint(out, "then")
+| T_ELSE() => fprint(out, "else")
+//
+| T_WHEN() => fprint(out, "when")
+| T_WITH() => fprint(out, "with")
+//
+| T_CASE(k0) =>
+  fprint!(out, "case(", k0, ")")
+//
+| T_SCASE() => fprint(out, "scase")
+//
+| T_ENDIF() => fprint(out, "endif")
+| T_ENDSIF() => fprint(out, "endsif")
+| T_ENDCASE() => fprint(out, "endcase")
+| T_ENDSCASE() => fprint(out, "endscase")
+//
+| T_LAM(knd) =>
+  fprint!(out, "lam(", knd, ")")
+| T_FIX(knd) =>
+  fprint!(out, "fix(", knd, ")")
+//
+| T_LET() => fprint(out, "let")
+| T_TRY() => fprint(out, "try")
+| T_WHERE() => fprint(out, "where")
+| T_LOCAL() => fprint(out, "local")
+//
+| T_ENDLAM() => fprint(out, "endlam")
+| T_ENDLET() => fprint(out, "endlet")
+| T_ENDTRY() => fprint(out, "endtry")
+| T_ENDWHERE() => fprint(out, "endwhere")
+| T_ENDLOCAL() => fprint(out, "endlocal")
+//
+| T_VAL(vlk) => fprint(out, vlk)
+| T_VAR() => fprint!(out, "var")
+//
+| T_FUN(fnk) =>
+  fprint!(out, "FUN(", fnk, ")")
+//
+| T_IMPLMNT(knd) =>
+  fprint!(out, "implmnt(", knd, ")")
+//
+| T_ABSSORT() =>
+  fprint!(out, "abssort(", ")")
+//
+| T_SORTDEF() =>
+  fprint!(out, "sortdef(", ")")
+//
+| T_SEXPDEF(knd) =>
+  fprint!(out, "sexpdef(", knd, ")")
+//
+| T_ABSTYPE(knd) =>
+  fprint!(out, "abstype(", knd, ")")
+//
+| T_ABSIMPL() =>
+  fprint!(out, "absimpl")
+| T_ABSOPEN() =>
+  fprint!(out, "absopen")
+//
+| T_DATASORT() =>
+  fprint!(out, "datasort")
+//
+| T_EXCPTCON() =>
+  fprint!(out, "excptcon")
+//
+| T_DATATYPE(knd) =>
+  fprint!(out, "datatype(", knd, ")")
+//
+| T_WITHTYPE(knd) =>
+  fprint!(out, "withtype(", knd, ")")
+//
+| T_SRP_NONFIX() =>
+  fprint!(out, "#nonfix")
+| T_SRP_FIXITY(knd) =>
+  fprint!(out, "#fixity(", knd, ")")
+//
+| T_SRP_STACST() => fprint!(out, "#stacst")
+//
+| T_SRP_STATIC() => fprint!(out, "#static")
+| T_SRP_EXTERN() => fprint!(out, "#extern")
+//
+| T_SRP_DEFINE() => fprint!(out, "#define")
+| T_SRP_MACDEF() => fprint!(out, "#macdef")
+//
+| T_SRP_INCLUDE() => fprint(out, "#include")
+//
+| T_SRP_STALOAD() => fprint(out, "#staload")
+| T_SRP_DYNLOAD() => fprint(out, "#dynload")
+//
+| T_SRP_SYMLOAD() => fprint(out, "#symload")
+//
+) (* end of [fprint2_tnode] *)
+
+implement
+fprint_token
+  (out, tok) = fprint(out, tok.node())
