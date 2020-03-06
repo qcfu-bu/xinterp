@@ -5,14 +5,11 @@
 (* ****** ****** *)
 //
 #staload
-"{$XANADU}/SATS/basics.sats"
-//
+LAB = "{$XANADU}/SATS/label0.sats"
 #staload
-"{$XANADU}/SATS/label0.sats"
+FIL = "{$XANADU}/SATS/filpath.sats"
 #staload
-"{$XANADU}/SATS/filpath.sats"
-#staload
-"{$XANADU}/SATS/locinfo.sats"
+LOC = "{$XANADU}/SATS/locinfo.sats"
 //
 (* ****** ****** *)
 //
@@ -21,6 +18,13 @@ LEX = "{$XANADU}/SATS/lexing.sats"
 //
 (* ****** ****** *)
 //
+#staload
+S0E = "{$XANADU}/SATS/staexp0.sats"
+#staload
+D0E = "{$XANADU}/SATS/dynexp0.sats"
+//
+#staload
+S1E = "{$XANADU}/SATS/staexp1.sats"
 #staload
 D1E = "{$XANADU}/SATS/dynexp1.sats"
 //
