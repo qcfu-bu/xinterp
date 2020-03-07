@@ -41,10 +41,18 @@ LIBGC=-lgc
 ######
 
 SRCSATS := \
-pprint.sats \
+pprint.sats
 
 SRCDATS := \
 pprint_basic.dats \
+pprint_lexing.dats \
+pprint_symbol.dats \
+pprint_label0.dats \
+pprint_staexp0.dats \
+pprint_dynexp0.dats \
+pprint_staexp1.dats \
+pprint_dynexp1.dats \
+pread01_dynexp.dats
 
 ######
 

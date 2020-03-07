@@ -59,6 +59,8 @@ UN = "prelude/SATS/unsafe.sats"
 //
 #include
 "./../HATS/libxatsopt.hats"
+#include
+"./../HATS/libextension.hats"
 //
 (* ****** ****** *)
 //
@@ -728,7 +730,11 @@ d1cs = trans01_declist(d0cs)
 in
 d1cs where
 {
+  local
+  #staload "./../extension/pprint/DATS/pread01_dynexp.dats"
+  in
   val () = tread01_main(d1cs)
+  end
 }
 end // end of [val]
 (*

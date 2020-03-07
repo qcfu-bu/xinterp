@@ -11,6 +11,8 @@ UN = "prelude/SATS/unsafe.sats"
 #staload
 "{$XANADU}/SATS/symbol.sats"
 
+(* ****** ****** *)
+
 implement
 fprint_symbol
   (out, x0) = fprint!(out, x0.name())

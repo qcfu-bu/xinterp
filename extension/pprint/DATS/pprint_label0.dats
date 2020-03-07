@@ -9,13 +9,11 @@ UN = "prelude/SATS/unsafe.sats"
 #define XANADU_targetloc
 "./../../../xanadu/srcgen/xats"
 #staload
-"{$XANADU}/SATS/staexp0.sats"
-#staload
-"{$XANADU}/SATS/lexing.sats"
+"{$XANADU}/SATS/label0.sats"
 #staload
 "{$XANADU}/SATS/symbol.sats"
-#staload
-"{$XANADU}/SATS/label0.sats"
+
+(* ****** ****** *)
 
 implement
 fprint_label
@@ -23,7 +21,7 @@ fprint_label
 (
 case+ l0 of
 | LABint(i0) =>
-  fprint!(out, ".", i0)
+  fprint!(out, "LABint(", i0, ")")
 | LABsym(s0) =>
-  fprint!(out, ".", s0)
+  fprint!(out, "LABsym(", s0, ")")
 )

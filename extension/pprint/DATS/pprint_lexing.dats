@@ -287,28 +287,7 @@ case+ tnd of
 ) (* end of [fprint_tnode] *)
 //
 (* ****** ****** *)
-//
-implement
-print_token
-  (tok) =
-  fprint_token(stdout_ref, tok)
-implement
-prerr_token
-  (tok) =
-  fprint_token(stderr_ref, tok)
-//
-implement
-fprint_token
-  (out, tok) =
-(
-  fprint(out, tok.node())
-(*
-  fprint!(out, tok.loc(), ": ", tok.node())
-*)
-)
-//
-(* ****** ****** *)
-//
+
 implement
 print2_tnode
   (tok) =

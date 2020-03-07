@@ -1,6 +1,7 @@
 dirpath = TEST/
 the_basics_load: prelude/basics.sats
 the_prelude_load: prelude/xsetup.sats
+the_prelude_load: prelude/excptn.sats
 the_prelude_load: prelude/SATS/bool.sats
 the_prelude_load: prelude/SATS/char.sats
 the_prelude_load: prelude/SATS/gint.sats
@@ -11,6 +12,7 @@ the_prelude_load: prelude/SATS/gseq.sats
 the_prelude_load: prelude/SATS/optn.sats
 the_prelude_load: prelude/SATS/list.sats
 the_prelude_load: prelude/SATS/stream.sats
+the_prelude_load: prelude/SATS/string.sats
 the_prelude_load: prelude/SATS/optn_vt.sats
 the_prelude_load: prelude/SATS/list_vt.sats
 the_prelude_load: prelude/SATS/stream_vt.sats
